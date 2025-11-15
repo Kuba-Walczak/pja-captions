@@ -13,7 +13,7 @@ if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
-    contextBridge.exposeInMainWorld('env', process.env.API_KEY)
+    contextBridge.exposeInMainWorld('env', { API_KEY: process.env.API_KEY })
   } catch (error) {
     console.error(error)
   }
