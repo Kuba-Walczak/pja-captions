@@ -5,6 +5,58 @@ import { is } from '@electron-toolkit/utils'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
+    fullscreen: true,
+    show: false,
+    autoHideMenuBar: true,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    backgroundColor: '#00000000',
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.ts'),
+      sandbox: false
+    }
+  })
+
+  // Make window click-through so clicks pass to underlying apps
+  mainWindow.setIgnoreMouseEvents(true, { forward: true })
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show()
+  })
+
+  // Keyboard toggle for DevTools (F12 or Ctrl+Shift+I) in development
+  if (is.dev) {
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+      if (input.type !== 'keyDown') return
+      const isF12 = input.key === 'F12'
+      const isCtrlShiftI =
+        (process.platform === 'darwin'
+          ? input.meta
+          : input.control) && input.shift && input.key.toUpperCase() === 'I'
+      if (isF12 || isCtrlShiftI) {
+        if (mainWindow.webContents.isDevToolsOpened()) {
+          mainWindow.webContents.closeDevTools()
+        } else {
+          mainWindow.webContents.openDevTools({ mode: 'detach' })
+        }
+        event.preventDefault()
+      }
+    })
+  }
+
+  // HMR for renderer base on electron-vite cli.
+  // Load the remote URL for development or the local html file for production.
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+  } else {
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+  }
+}
+
+function createWindow2(): void {
+  // Create the browser window.
+  const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -17,12 +69,8 @@ function createWindow(): void {
     }
   })
 
-  mainWindow.on('ready-to-show', () => {
+  mainWindow.once('ready-to-show', () => {
     mainWindow.show()
-    // Auto-open DevTools in development
-    if (is.dev) {
-      mainWindow.webContents.openDevTools({ mode: 'detach' })
-    }
   })
 
   // Keyboard toggle for DevTools (F12 or Ctrl+Shift+I) in development
@@ -58,7 +106,7 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  createWindow()
+  createWindow2()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

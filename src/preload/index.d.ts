@@ -4,5 +4,6 @@ declare global {
   interface Window {
     electron: ElectronAPI
     api: unknown
+    env: { API_KEY: string }
   }
 }

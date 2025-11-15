@@ -1,16 +1,25 @@
-
-
 export class WebSocketClient {
 
     private socket: WebSocket;
 
-    WebSocketClient() {
-        this.socket = new WebSocket('wss://eu2.rt.speechmatics.com/v2/');
-    }
+    constructor() {
 
+        fetch('https://mp.speechmatics.com/v1/api_keys?type=rt',
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + window.env.API_KEY
+                },
+                body: JSON.stringify({ ttl: 60 })
+            })
+            .then(response => response.json())
+            .then(data => console.log(data.key_value))
+
+    }
+    
     test() {
-        if (this.socket.OPEN)
-            console.log('WebSocket is open');
+        console.log(this.socket.readyState);
     }
 
     close() {
