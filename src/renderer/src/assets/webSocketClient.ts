@@ -1,3 +1,5 @@
+import { getSelectedInputDevice } from '../components/audioDevice';
+
 export class WebSocketClient {
 
     private socket: WebSocket;
@@ -36,7 +38,8 @@ export class WebSocketClient {
     }
     
     test() {
-        console.log(this.socket.readyState);
+        while (true) {
+        };
     }
 
     close() {

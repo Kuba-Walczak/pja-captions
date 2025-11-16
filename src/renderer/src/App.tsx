@@ -1,7 +1,7 @@
 import React from 'react'
 import { WebSocketClient } from './assets/webSocketClient';
 
-function App() {
+export default function App() {
 
   let wsClient: WebSocketClient;
 
@@ -13,5 +13,3 @@ function App() {
     </div>
   )
 }
-
-export default App
