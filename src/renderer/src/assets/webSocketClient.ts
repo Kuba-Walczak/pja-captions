@@ -1,4 +1,4 @@
-import { getSelectedInputDevice } from '../components/audioDevice';
+import { getSelectedInputDeviceId } from '../components/audioDevice';
 
 export class WebSocketClient {
 
@@ -21,7 +21,11 @@ export class WebSocketClient {
                 this.socket.onopen = () => {
                     console.log('WebSocket opened, readyState:', this.socket.readyState);
                 };
-                
+                this.socket.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    if (data.metadata)
+                        console.log(data.metadata.transcript);
+                };
                 this.socket.onerror = (error) => {
                     console.error('WebSocket error:', error);
                 };
@@ -37,9 +41,48 @@ export class WebSocketClient {
 
     }
     
-    test() {
-        while (true) {
-        };
+    async test() {
+        const selectedInputDeviceId = getSelectedInputDeviceId();
+        let selectedInputDeviceStream: MediaStream | null = null;
+        navigator.mediaDevices.getUserMedia({audio: {deviceId: selectedInputDeviceId}}).then(async stream => {
+            console.log(stream);
+            selectedInputDeviceStream = new MediaStream([stream.getAudioTracks()[0]]);
+            const audioContext = new AudioContext({sampleRate: 16000});
+            const source = audioContext.createMediaStreamSource(selectedInputDeviceStream!);
+            await audioContext.audioWorklet.addModule(new URL('./processor.js', import.meta.url));
+            const processor = new AudioWorkletNode(audioContext, "processor");
+            this.socket.send(JSON.stringify({
+                message: "StartRecognition",
+                audio_format: {
+                    type: "raw",
+                    encoding: "pcm_s16le",
+                    sample_rate: 16000
+                },
+                transcription_config: {
+                    language: "pl",
+                    max_delay: 1,
+                    enable_partials: true
+                }
+            }));
+            processor.port.onmessage = (event) => {
+                const float32Data = event.data.audioData;
+                // Convert Float32Array to Int16 PCM (Speechmatics format)
+                const int16Data = new Int16Array(float32Data.length);
+                for (let i = 0; i < float32Data.length; i++) {
+                    int16Data[i] = Math.max(-32768, Math.min(32767, float32Data[i] * 32768));
+                }
+                //console.log('Speechmatics PCM format:', int16Data.buffer);
+                this.socket.send(int16Data.buffer);
+            };
+            source.connect(processor).connect(audioContext.destination);
+            console.log("Your microphone audio is being used.");
+            setTimeout(() => {
+                selectedInputDeviceStream!.getTracks().forEach(track => track.stop());
+                console.log("Your microphone audio is not used anymore.");
+            }, 5000);
+        }).catch(error => {
+            console.error('Error getting input device from device id:', selectedInputDeviceId, error);
+        });
     }
 
     close() {

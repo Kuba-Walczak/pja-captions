@@ -1,9 +1,9 @@
 import React,{ useEffect, useState } from 'react';
 
-let selectedInputDevice: MediaDeviceInfo | undefined;
+let selectedInputDeviceId: string | undefined;
 
-export function getSelectedInputDevice() {
-    return selectedInputDevice;
+export function getSelectedInputDeviceId() {
+    return selectedInputDeviceId;
 }
 
 export default function AudioDevice() {
@@ -23,7 +23,7 @@ export default function AudioDevice() {
 
     return (
         <select onChange={(e) => {
-            selectedInputDevice = inputDevices.find(device => device.deviceId === e.currentTarget.value)
+            selectedInputDeviceId = e.currentTarget.value;
         }}>
             <option>Select an input device</option>
             {inputDevices.map((device) => <option value={device.deviceId}>{device.label}</option>)}
