@@ -10,6 +10,7 @@ export default function App() {
       <button onClick={() => wsClient = new WebSocketClient()}>Get API Key</button>
     <button onClick={() => wsClient.test()}>Click me</button>
     <button onClick={() => wsClient.close()}>Close</button>
+    <button onClick={() => window.api.testfn()}>Window</button>
     </div>
   )
 }

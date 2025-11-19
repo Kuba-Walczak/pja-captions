@@ -1,10 +1,12 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import dotenv from 'dotenv';
 dotenv.config();
 
 // Custom APIs for renderer
-const api = {}
+const api = {
+  testfn: () => ipcRenderer.invoke('testfn')
+}
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

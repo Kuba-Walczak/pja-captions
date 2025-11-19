@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 
@@ -48,11 +48,15 @@ function createWindow(): void {
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    mainWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}?window=2`)
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadURL(`${join(__dirname, '../renderer/index2.html')}?window=2`)
   }
 }
+
+ipcMain.handle('testfn', async () => {
+  return createWindow()
+})
 
 function createWindow2(): void {
   // Create the browser window.
@@ -96,9 +100,10 @@ function createWindow2(): void {
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
+    console.log('ELECTRON_RENDERER_URL:', process.env['ELECTRON_RENDERER_URL'])
+    mainWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}?window=1`)
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadURL(`${join(__dirname, '../renderer/index.html')}?window=1`)
   }
 }
 

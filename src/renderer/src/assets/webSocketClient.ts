@@ -1,4 +1,5 @@
 import { getSelectedInputDeviceId } from '../components/audioDevice';
+import { addCaption } from '../components/Captions';
 
 export class WebSocketClient {
 
@@ -23,8 +24,15 @@ export class WebSocketClient {
                 };
                 this.socket.onmessage = (event) => {
                     const data = JSON.parse(event.data);
-                    if (data.metadata)
-                        console.log(data.metadata.transcript);
+                    switch (data.message) {
+                        case 'AddTranslation':
+                            addCaption(data.results[0].content);
+                            break;
+                        case 'AudioAdded':
+                            break;
+                        default:
+                            console.log(data);
+                    }
                 };
                 this.socket.onerror = (error) => {
                     console.error('WebSocket error:', error);
@@ -45,7 +53,6 @@ export class WebSocketClient {
         const selectedInputDeviceId = getSelectedInputDeviceId();
         let selectedInputDeviceStream: MediaStream | null = null;
         navigator.mediaDevices.getUserMedia({audio: {deviceId: selectedInputDeviceId}}).then(async stream => {
-            console.log(stream);
             selectedInputDeviceStream = new MediaStream([stream.getAudioTracks()[0]]);
             const audioContext = new AudioContext({sampleRate: 16000});
             const source = audioContext.createMediaStreamSource(selectedInputDeviceStream!);
@@ -60,8 +67,11 @@ export class WebSocketClient {
                 },
                 transcription_config: {
                     language: "pl",
-                    max_delay: 1,
-                    enable_partials: true
+                    max_delay: 0.7,
+                    max_delay_mode: 'flexible'
+                },
+                translation_config: {
+                    target_languages: ["en"]
                 }
             }));
             processor.port.onmessage = (event) => {
@@ -75,11 +85,6 @@ export class WebSocketClient {
                 this.socket.send(int16Data.buffer);
             };
             source.connect(processor).connect(audioContext.destination);
-            console.log("Your microphone audio is being used.");
-            setTimeout(() => {
-                selectedInputDeviceStream!.getTracks().forEach(track => track.stop());
-                console.log("Your microphone audio is not used anymore.");
-            }, 5000);
         }).catch(error => {
             console.error('Error getting input device from device id:', selectedInputDeviceId, error);
         });
