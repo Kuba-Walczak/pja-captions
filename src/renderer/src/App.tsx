@@ -7,7 +7,7 @@ export default function App() {
     <div>
       <button onClick={() => initiateConnection()}>Connect</button>
       <button onClick={() => terminateConnection()}>Close</button>
-      <button onClick={() => window.api.testfn()}>Window</button>
+      <button onClick={() => window.electronAPI.testfn()}>Window</button>
     </div>
   )
 }

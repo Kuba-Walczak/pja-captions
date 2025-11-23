@@ -5,6 +5,7 @@ declare global {
     electron: ElectronAPI
     api: {
       testfn: () => Promise<void>
+      IPCTest: () => void
     }
     env: { API_KEY: string }
   }

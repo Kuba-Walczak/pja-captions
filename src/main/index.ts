@@ -54,24 +54,32 @@ function createWindow(): void {
   }
 }
 
-ipcMain.handle('testfn', async () => {
+ipcMain.on('testfn', async () => {
   createWindow()
+  console.log('testfn')
+})
+
+ipcMain.on('IPCTest', async () => {
+  console.log('IPCTest')
 })
 
 function createWindow2(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    fullscreen: true,
     show: false,
     autoHideMenuBar: true,
-    transparent: false,
-    frame: true,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    backgroundColor: '#00000000',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
   })
+
+  mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()

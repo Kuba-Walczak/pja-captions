@@ -23,6 +23,7 @@ export default function Captions() {
     const [captions, setCaptions] = useState('')
 
     const addTranscript = (transcript : string) => {
+        window.api.IPCTest()
     //temp implementation
     setCaptions(transcript)
     // const newArray = [...captionArray, transcript]
