@@ -1,9 +1,9 @@
 import { getSelectedInputDeviceId } from '../components/audioDevice';
-import { addCaption } from '../components/Captions';
 
 export class WebSocketClient {
 
-    private socket: WebSocket;
+    socket: WebSocket | null
+    onTranscript: (t: string) => void;
 
     constructor() {
 
@@ -20,22 +20,17 @@ export class WebSocketClient {
             .then(key => {
                 this.socket = new WebSocket('wss://neu.rt.speechmatics.com/v2?jwt=' + key.key_value)
                 this.socket.onopen = () => {
-                    console.log('WebSocket opened, readyState:', this.socket.readyState);
+                    console.log('WebSocket opened, readyState:', this.socket!.readyState)
                 };
                 this.socket.onmessage = (event) => {
+                    console.log('asd')
                     const data = JSON.parse(event.data);
-                    switch (data.message) {
-                        case 'AddTranslation':
-                            addCaption(data.results[0].content);
-                            break;
-                        case 'AudioAdded':
-                            break;
-                        default:
-                            console.log(data);
+                    if (data.message === 'AddTranslation') {
+                    this.onTranscript!(data.results[0].content)
                     }
                 };
                 this.socket.onerror = (error) => {
-                    console.error('WebSocket error:', error);
+                    console.error('WebSocket error:', error)
                 };
                 
                 this.socket.onclose = (event) => {
@@ -49,7 +44,7 @@ export class WebSocketClient {
 
     }
     
-    async test() {
+    async connect() {
         const selectedInputDeviceId = getSelectedInputDeviceId();
         let selectedInputDeviceStream: MediaStream | null = null;
         navigator.mediaDevices.getUserMedia({audio: {deviceId: selectedInputDeviceId}}).then(async stream => {
@@ -58,7 +53,7 @@ export class WebSocketClient {
             const source = audioContext.createMediaStreamSource(selectedInputDeviceStream!);
             await audioContext.audioWorklet.addModule(new URL('./processor.js', import.meta.url));
             const processor = new AudioWorkletNode(audioContext, "processor");
-            this.socket.send(JSON.stringify({
+            this.socket!.send(JSON.stringify({
                 message: "StartRecognition",
                 audio_format: {
                     type: "raw",
@@ -82,7 +77,7 @@ export class WebSocketClient {
                     int16Data[i] = Math.max(-32768, Math.min(32767, float32Data[i] * 32768));
                 }
                 //console.log('Speechmatics PCM format:', int16Data.buffer);
-                this.socket.send(int16Data.buffer);
+                this.socket!.send(int16Data.buffer);
             };
             source.connect(processor).connect(audioContext.destination);
         }).catch(error => {
@@ -91,7 +86,8 @@ export class WebSocketClient {
     }
 
     close() {
-        this.socket.close();
+        this.socket!.close();
+        this.socket = null;
     }
 
 }

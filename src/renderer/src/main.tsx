@@ -15,6 +15,7 @@ createRoot(document.getElementById('root')!).render(
       <>
         <App />
         <AudioDevice />
+        <Captions />
       </>
     )}
   </StrictMode>

@@ -13,7 +13,7 @@ function createWindow(): void {
     alwaysOnTop: true,
     backgroundColor: '#00000000',
     webPreferences: {
-      preload: join(__dirname, '../preload/index.ts'),
+      preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
   })
@@ -55,7 +55,7 @@ function createWindow(): void {
 }
 
 ipcMain.handle('testfn', async () => {
-  return createWindow()
+  createWindow()
 })
 
 function createWindow2(): void {
