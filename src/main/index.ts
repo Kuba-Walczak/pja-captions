@@ -16,7 +16,6 @@ ipcMain.on('setIgnoreMouseEvents', (event: IpcMainEvent, ignore: boolean, option
 })
 
 function createWindow(): void {
-  // Create the browser window.
   mainWindow = new BrowserWindow({
     fullscreen: true,
     show: false,
@@ -31,13 +30,14 @@ function createWindow(): void {
     }
   })
 
-  //mainWindow.setIgnoreMouseEvents(true, { forward: true })
+  mainWindow.setAlwaysOnTop(true, 'screen-saver')
+  mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
 
-    mainWindow.setIgnoreMouseEvents(true, { forward: true })
   })
+
 
   // Keyboard toggle for DevTools (F12 or Ctrl+Shift+I) in development
   if (is.dev) {
