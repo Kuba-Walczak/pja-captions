@@ -33,7 +33,7 @@ export class WebSocketClient {
                         transcription_config: {
                             operating_point: 'enhanced',
                             language: "pl",
-                            max_delay: 4,
+                            max_delay: 0.7,
                             max_delay_mode: 'flexible'
                         },
                         translation_config: {
@@ -66,7 +66,7 @@ export class WebSocketClient {
                     const data = JSON.parse(event.data)
                     switch (data.message) {
                         case 'AddTranslation':
-                            window.api.transcriptToBackend("Translation: " + data.results[0].content)
+                            //window.api.transcriptToBackend("Translation: " + data.results[0].content)
                             break;
                         case 'AddPartialTranslation':
                             window.api.transcriptToBackend("Partial Translation: " + data.results[0].content)

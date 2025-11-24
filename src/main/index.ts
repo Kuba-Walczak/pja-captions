@@ -5,7 +5,6 @@ import { is } from '@electron-toolkit/utils'
 let mainWindow: BrowserWindow
 
 ipcMain.on('transcriptToBackend', (_event: IpcMainEvent, value : string) => {
-  console.log(value)
   mainWindow.webContents.send('transcriptToFrontEnd', value)
 })
 
