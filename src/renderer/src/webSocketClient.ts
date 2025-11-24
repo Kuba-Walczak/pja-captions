@@ -69,7 +69,7 @@ export class WebSocketClient {
                             //window.api.transcriptToBackend("Translation: " + data.results[0].content)
                             break;
                         case 'AddPartialTranslation':
-                            window.api.transcriptToBackend("Partial Translation: " + data.results[0].content)
+                            window.api.transcriptToBackend(data.results[0].content)
                             break;
                     }
                 };

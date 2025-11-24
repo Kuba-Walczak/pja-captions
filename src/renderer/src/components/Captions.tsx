@@ -28,8 +28,10 @@ export default function Captions() {
         window.api.transcriptToFrontEnd((text : string) => {setCaptions(text)})}, [])
             
     return (
-        <div>
-            <h1 className="text-6x1 font-bold text-white align-right">dasdasddddddddddddddddddddddds{captions}</h1>
+        <div className="fixed flex bottom-0 left-0 right-0 items-end px-24 py-52 overflow-hidden">
+            <h1 className="text-7xl text-white bg-black px-6 py-4 rounded-xl max-w-[90%] break-words whitespace-normal">
+                assdasd{captions}
+            </h1>
         </div>
     )
 }
