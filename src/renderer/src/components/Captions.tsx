@@ -24,12 +24,12 @@ export default function Captions() {
 
     const [captions, setCaptions] = useState('')
 
-    window.api.transcriptToFrontEnd((text : string) => {
-            setCaptions(text);
+    useEffect(() => {
+        window.api.transcriptToFrontEnd((text : string) => {setCaptions(text)})}, [])
             
     return (
         <div>
-            <h1 className="text-6xl font-bold text-white" style={{ color: 'white', fontSize: '5rem' }}>dasads{captions}</h1>
+            <h1 className="text-6x1 font-bold text-white align-right">dasdasddddddddddddddddddddddds{captions}</h1>
         </div>
     )
 }
