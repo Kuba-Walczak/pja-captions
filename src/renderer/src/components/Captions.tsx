@@ -1,40 +1,41 @@
 import { useState, useEffect } from 'react'
-import { WebSocketClient } from '../assets/webSocketClient'
 import React from 'react'
-
-let webSocketClient : WebSocketClient | null
+import { WebSocketClient } from '../webSocketClient'
 
 let captionArray: string[]
 
-export function initiateConnection() {
-    if (webSocketClient) return
-    webSocketClient = new WebSocketClient()
-    setTimeout(() => {webSocketClient!.connect()}, 500)
-}
+let webSocketClient : WebSocketClient | null
 
-export function terminateConnection() {
-    if (!webSocketClient) return
-    webSocketClient!.close()
-    webSocketClient = null
+export function initiateConnection() {
+    console.log('initiateConnection')
+    if (webSocketClient) return
+        webSocketClient = new WebSocketClient()
+        webSocketClient.connect()
 }
+  
+ export function terminateConnection() {
+    if (!webSocketClient) return
+    console.log('terminateConnection')
+    webSocketClient.close()
+    webSocketClient = null
+ }
 
 export default function Captions() {
 
     const [captions, setCaptions] = useState('')
 
-    const addTranscript = (transcript : string) => {
-        window.api.IPCTest()
+    useEffect(() => {
+        window.api.transcriptToFrontEnd((text : string) => {
+            setCaptions(text);
+        });
+    }, [])
     //temp implementation
-    setCaptions(transcript)
     // const newArray = [...captionArray, transcript]
     // console.log(newArray)
     // if (newArray.length > 5)
     //     newArray.length = 0;
     // captionArray = newArray
-}
-setTimeout(() => {
-    console.log(webSocketClient)
-    webSocketClient!.onTranscript = addTranscript}, 1000)
+// }
     // useEffect(() => {
     // //temp implementation
     // let combinedString: string = ''
@@ -47,7 +48,7 @@ setTimeout(() => {
 
     return (
         <div>
-            <h1 className="text-6xl font-bold text-white" style={{ color: 'black', fontSize: '5rem' }}>{captions}</h1>
+            <h1 className="text-6xl font-bold text-white" style={{ color: 'white', fontSize: '5rem' }}>dasads{captions}</h1>
         </div>
     )
 }

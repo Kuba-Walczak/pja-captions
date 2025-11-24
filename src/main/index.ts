@@ -1,10 +1,24 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, IpcMainEvent, type IgnoreMouseEventsOptions } from 'electron'
 import { join } from 'path'
 import { is } from '@electron-toolkit/utils'
 
+let mainWindow: BrowserWindow
+
+ipcMain.on('transcriptToBackend', (_event: IpcMainEvent, value : string) => {
+  console.log(value)
+  mainWindow.webContents.send('transcriptToFrontEnd', value)
+})
+
+ipcMain.on('setIgnoreMouseEvents', (event: IpcMainEvent, ignore: boolean, options?: IgnoreMouseEventsOptions) => {
+  const windowFromSender = BrowserWindow.fromWebContents(event.sender)
+  if (windowFromSender) {
+    windowFromSender.setIgnoreMouseEvents(ignore, options)
+  }
+})
+
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     fullscreen: true,
     show: false,
     autoHideMenuBar: true,
@@ -18,71 +32,12 @@ function createWindow(): void {
     }
   })
 
-  // Make window click-through so clicks pass to underlying apps
-  mainWindow.setIgnoreMouseEvents(true, { forward: true })
+  //mainWindow.setIgnoreMouseEvents(true, { forward: true })
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
-  })
 
-  // Keyboard toggle for DevTools (F12 or Ctrl+Shift+I) in development
-  if (is.dev) {
-    mainWindow.webContents.on('before-input-event', (event, input) => {
-      if (input.type !== 'keyDown') return
-      const isF12 = input.key === 'F12'
-      const isCtrlShiftI =
-        (process.platform === 'darwin'
-          ? input.meta
-          : input.control) && input.shift && input.key.toUpperCase() === 'I'
-      if (isF12 || isCtrlShiftI) {
-        if (mainWindow.webContents.isDevToolsOpened()) {
-          mainWindow.webContents.closeDevTools()
-        } else {
-          mainWindow.webContents.openDevTools({ mode: 'detach' })
-        }
-        event.preventDefault()
-      }
-    })
-  }
-
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}?window=2`)
-  } else {
-    mainWindow.loadURL(`${join(__dirname, '../renderer/index2.html')}?window=2`)
-  }
-}
-
-ipcMain.on('testfn', async () => {
-  createWindow()
-  console.log('testfn')
-})
-
-ipcMain.on('IPCTest', async () => {
-  console.log('IPCTest')
-})
-
-function createWindow2(): void {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    fullscreen: true,
-    show: false,
-    autoHideMenuBar: true,
-    transparent: true,
-    frame: false,
-    alwaysOnTop: true,
-    backgroundColor: '#00000000',
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
-    }
-  })
-
-  mainWindow.setIgnoreMouseEvents(true, { forward: true })
-
-  mainWindow.once('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow.setIgnoreMouseEvents(true, { forward: true })
   })
 
   // Keyboard toggle for DevTools (F12 or Ctrl+Shift+I) in development
@@ -119,7 +74,7 @@ function createWindow2(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  createWindow2()
+  createWindow()
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
