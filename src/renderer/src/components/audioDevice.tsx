@@ -1,4 +1,5 @@
-import React,{ useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 let selectedInputDeviceId: string | undefined;
 
@@ -22,11 +23,15 @@ export default function AudioDevice() {
     }
 
     return (
-        <select onChange={(e) => {
-            selectedInputDeviceId = e.currentTarget.value;
+        <Select onValueChange={(e) => {
+            selectedInputDeviceId = e;
         }}>
-            <option>Select an input device</option>
-            {inputDevices.map((device) => <option value={device.deviceId}>{device.label}</option>)}
-        </select>
+            <SelectTrigger className="w-[150px] h-[80px]">
+                <SelectValue placeholder="Select Audio Device" />
+            </SelectTrigger>
+            <SelectContent>
+                {inputDevices.map((device) => <SelectItem value={device.deviceId}>{device.label}</SelectItem>)}
+            </SelectContent>
+        </Select>
     )
 }
