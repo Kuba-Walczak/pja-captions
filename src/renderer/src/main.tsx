@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { initiateConnection, terminateConnection } from './components/Captions'
-import { Power } from 'lucide-react'
+import { Power, X } from 'lucide-react'
 
 const handleMouseEnter = () => {
   console.log('mouse enter')
@@ -26,12 +26,19 @@ const handleMouseLeave = () => {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <div className="flex absolute top-0 right-0 bg-white w-[550px] rounded-xl m-12 p-12" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-      <AudioDevice/>
-      <Button variant="outline" size="customicon" onClick={() => initiateConnection()}>
-        <Power/>
-      </Button>
-      <Button className='ml-auto' variant="outline" size="custom" onClick={() => terminateConnection()}>Close</Button>
+    <div className="flex flex-col items-center absolute top-0 right-0 rounded-xl m-12 hover:opacity-100 opacity-100 transition-opacity duration-300" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <div className='flex items-center justify-between gap-4 bg-stone-900 p-2 w-full rounded-t-xl'>
+        <p className='text-white font-bold'>PJA Captions</p>
+        <Button variant="destructive" className='w-5 h-5 bg-red-500' onClick={() => terminateConnection()}>
+          <X className='center' />
+        </Button>
+      </div>
+      <div className='flex flex-col items-center gap-4 bg-stone-800 p-12 w-full rounded-b-xl'>
+        <AudioDevice/>
+        <Button variant="outline" size="customicon" onClick={() => initiateConnection()}>
+          <Power className='center' />
+        </Button>
+      </div>
     </div>
     <Captions />
   </StrictMode>

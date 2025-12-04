@@ -1,8 +1,5 @@
 import { useState, useEffect } from 'react'
-import React from 'react'
 import { WebSocketClient } from '../webSocketClient'
-
-let captionArray: string[]
 
 let webSocketClient : WebSocketClient | null
 
